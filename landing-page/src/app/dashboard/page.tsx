@@ -227,6 +227,7 @@ export default function Dashboard() {
         justifyContent: 'center',
         minHeight: '100vh',
         width: '100%',
+        backgroundColor: '#121212',
       }}>
         <p style={{ color: 'white' }}>Loading...</p>
       </div>
@@ -236,151 +237,318 @@ export default function Dashboard() {
   return (
     <div style={{
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: 'column',
       minHeight: '100vh',
       width: '100%',
-      padding: '1rem'
+      backgroundColor: '#121212',
+      color: 'white',
     }}>
+      {/* App Bar */}
       <div style={{
-        backgroundColor: '#121212',
-        borderRadius: '0.75rem',
-        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-        width: '100%',
-        maxWidth: '28rem',
-        padding: '1.5rem',
-        color: 'white',
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center'
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0.75rem 1.5rem',
+        backgroundColor: '#1F1F28',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       }}>
-        <div style={{ marginBottom: '1rem', width: '120px', height: '80px', position: 'relative' }}>
+        {/* Logo */}
+        <div style={{ height: '40px', width: '40px', position: 'relative' }}>
           <Image 
             src="/irregular_chat_logo.png" 
-            alt="Irregular Chat Logo" 
+            alt="Logo" 
             fill
             style={{ objectFit: 'contain' }}
           />
         </div>
         
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', textAlign: 'center' }}>
-          Welcome to Your Dashboard
-        </h1>
-        
-        <div style={{ width: '100%', marginBottom: '1.5rem' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>User Profile</h2>
-          <div style={{ backgroundColor: '#1F1F28', padding: '1rem', borderRadius: '0.5rem' }}>
-            {user.data.email && (
-              <p style={{ marginBottom: '0.5rem' }}>
-                <strong>Email:</strong> {user.data.email}
-              </p>
-            )}
-            {user.data.name && (
-              <p style={{ marginBottom: '0.5rem' }}>
-                <strong>Name:</strong> {user.data.name}
-              </p>
-            )}
-            {invitedBy && (
-              <p style={{ marginBottom: '0.5rem' }}>
-                <strong>Invited by:</strong> {invitedBy}
-              </p>
-            )}
-            {user.data.sponsor && (
-              <p style={{ marginBottom: '0.5rem' }}>
-                <strong>Sponsor:</strong> {user.data.sponsor}
-              </p>
-            )}
-            {user.data.interests && (
-              <p style={{ marginBottom: '0.5rem' }}>
-                <strong>Interests:</strong> {user.data.interests}
-              </p>
-            )}
-            {user.data.signal_id && (
-              <p style={{ marginBottom: '0.5rem' }}>
-                <strong>Signal ID:</strong> {user.data.signal_id}
-              </p>
-            )}
-            {user.data.organization && (
-              <p style={{ marginBottom: '0.5rem' }}>
-                <strong>Organization:</strong> {user.data.organization}
-              </p>
-            )}
-          </div>
-        </div>
-        
-        <div style={{ width: '100%', marginBottom: '1rem' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Invite a User</h2>
-          
-
-          
-          <div style={{ marginBottom: '0.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.875rem' }}>
-              Invitee Email
-            </label>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <input
-                type="email"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                placeholder="Enter email address"
-                style={{
-                  flex: 1,
-                  padding: '0.5rem',
-                  borderRadius: '0.25rem',
-                  backgroundColor: '#1F1F28',
-                  color: 'white',
-                  border: '1px solid #374151'
-                }}
-              />
-              <button
-                onClick={createInvite}
-                disabled={isCreatingInvite}
-                style={{
-                  padding: '0.5rem 1rem',
-                  borderRadius: '0.25rem',
-                  backgroundColor: isCreatingInvite ? '#4B5563' : '#10B981',
-                  color: 'white',
-                  border: 'none',
-                  cursor: isCreatingInvite ? 'not-allowed' : 'pointer'
-                }}
-              >
-                {isCreatingInvite ? 'Creating...' : 'Create Invite'}
-              </button>
-            </div>
-          </div>
-          
-          {errorMessage && (
-            <div style={{
-              backgroundColor: '#7F1D1D',
-              color: '#FCA5A5',
-              padding: '0.75rem',
-              borderRadius: '0.25rem',
-              fontSize: '0.875rem',
-              marginTop: '0.5rem'
-            }}>
-              {errorMessage}
-            </div>
-          )}
-        </div>
-        
-        <button
-          onClick={handleSignOut}
-          style={{
-            width: '100%',
-            padding: '0.5rem 1rem',
-            borderRadius: '0.25rem',
-            backgroundColor: '#7C3AED',
-            color: 'white',
+        {/* User Profile and Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {/* Settings Button with Material UI style settings icon */}
+          <button style={{
+            backgroundColor: 'transparent',
             border: 'none',
+            color: 'white',
             cursor: 'pointer',
-            marginBottom: '1rem'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '36px',
+            height: '36px',
+            padding: 0,
+            borderRadius: '50%',
+            transition: 'background-color 0.2s',
           }}
-        >
-          Sign Out
-        </button>
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title="Settings"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+          
+          {/* Sign Out Button with Material UI style logout icon */}
+          <button 
+            onClick={handleSignOut}
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              color: 'white',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '36px',
+              height: '36px',
+              padding: 0,
+              borderRadius: '50%',
+              transition: 'background-color 0.2s',
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            title="Logout"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+          
+          {/* User Email */}
+          <span style={{ fontWeight: '500' }}>
+            {user.data.email || 'User'}
+          </span>
+          
+          {/* Profile Picture - using first letter of name as placeholder */}
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            backgroundColor: '#7C3AED',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 'bold',
+          }}>
+            {user.data.name ? user.data.name.charAt(0).toUpperCase() : 'U'}
+          </div>
+        </div>
       </div>
       
-      {/* Invite Link Modal */}
+      {/* Main Content */}
+      <div style={{ padding: '2rem', flex: 1 }}>
+        {/* Knowledge Management Section */}
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+          Knowledge Management
+        </h2>
+        
+        {/* Knowledge Management Apps */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+          gap: '1.5rem',
+          marginBottom: '2rem',
+        }}>
+          {/* Forum App */}
+          <div style={{
+            backgroundColor: '#1F1F28',
+            borderRadius: '0.5rem',
+            padding: '1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+          }}>
+            <div style={{
+              width: '60px',
+              height: '60px',
+              backgroundColor: '#2D2D3A',
+              borderRadius: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '2rem',
+              marginBottom: '1rem',
+            }}>
+              F
+            </div>
+            <span style={{ fontWeight: '500' }}>Forum</span>
+          </div>
+        </div>
+        
+        {/* Communication Section */}
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', marginTop: '2rem' }}>
+          Communication
+        </h2>
+        
+        {/* Communication Apps */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+          gap: '1.5rem',
+          marginBottom: '2rem',
+        }}>
+          {/* Signal App */}
+          <div style={{
+            backgroundColor: '#1F1F28',
+            borderRadius: '0.5rem',
+            padding: '1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+          }}>
+            <div style={{
+              width: '60px',
+              height: '60px',
+              backgroundColor: '#2D2D3A',
+              borderRadius: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '2rem',
+              marginBottom: '1rem',
+            }}>
+              S
+            </div>
+            <span style={{ fontWeight: '500' }}>Signal</span>
+          </div>
+          
+          {/* Matrix App */}
+          <div style={{
+            backgroundColor: '#1F1F28',
+            borderRadius: '0.5rem',
+            padding: '1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+          }}>
+            <div style={{
+              width: '60px',
+              height: '60px',
+              backgroundColor: '#2D2D3A',
+              borderRadius: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '2rem',
+              marginBottom: '1rem',
+            }}>
+              M
+            </div>
+            <span style={{ fontWeight: '500' }}>Matrix</span>
+          </div>
+        </div>
+        
+        {/* User Profile Section */}
+        <div style={{ marginBottom: '2rem' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>User Profile</h2>
+          <div style={{ 
+            backgroundColor: '#1F1F28', 
+            padding: '1.5rem', 
+            borderRadius: '0.5rem',
+            maxWidth: '600px'
+          }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              {user.data.email && (
+                <div>
+                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Email</p>
+                  <p>{user.data.email}</p>
+                </div>
+              )}
+              {user.data.name && (
+                <div>
+                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Name</p>
+                  <p>{user.data.name}</p>
+                </div>
+              )}
+              {invitedBy && (
+                <div>
+                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Invited by</p>
+                  <p>{invitedBy}</p>
+                </div>
+              )}
+              {user.data.organization && (
+                <div>
+                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Organization</p>
+                  <p>{user.data.organization}</p>
+                </div>
+              )}
+              {user.data.signal_id && (
+                <div>
+                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Signal ID</p>
+                  <p>{user.data.signal_id}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        {/* Invite Section */}
+        <div style={{ marginBottom: '2rem', maxWidth: '600px' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Invite a User</h2>
+          <div style={{ 
+            backgroundColor: '#1F1F28', 
+            padding: '1.5rem', 
+            borderRadius: '0.5rem' 
+          }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+                Invitee Email
+              </label>
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="Enter email address"
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    borderRadius: '0.375rem',
+                    backgroundColor: '#2D2D3A',
+                    color: 'white',
+                    border: '1px solid #374151'
+                  }}
+                />
+                <button
+                  onClick={createInvite}
+                  disabled={isCreatingInvite}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '0.375rem',
+                    backgroundColor: isCreatingInvite ? '#4B5563' : '#7C3AED',
+                    color: 'white',
+                    border: 'none',
+                    cursor: isCreatingInvite ? 'not-allowed' : 'pointer',
+                    fontWeight: '500',
+                  }}
+                >
+                  {isCreatingInvite ? 'Creating...' : 'Create Invite'}
+                </button>
+              </div>
+            </div>
+            
+            {errorMessage && (
+              <div style={{
+                backgroundColor: '#7F1D1D',
+                color: '#FCA5A5',
+                padding: '0.75rem',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                marginTop: '1rem'
+              }}>
+                {errorMessage}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    {/* Invite Link Modal */}
       {showInviteLink && (
         <div style={{
           position: 'fixed',
