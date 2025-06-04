@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+export async function GET(request: NextRequest, context: { params: { userId: string } }) {
   try {
-    // Get userId from params - no need to await params.userId in Next.js 14+
-    const { userId } = params;
+    // Properly await params before accessing its properties
+    const params = await context.params;
+    const userId = params.userId;
+        
     const appKey = process.env.NEXT_PUBLIC_ROWND_APP_KEY;
     const appSecret = process.env.ROWND_APP_SECRET;
     const appId = process.env.NEXT_PUBLIC_ROWND_APP_ID;
@@ -18,9 +17,6 @@ export async function GET(
         { status: 500 }
       );
     }
-    
-    console.log(`Fetching user details for: ${userId}`);
-    console.log(`Using app ID: ${appId}`);
     
     // Use the correct headers as shown in the example
     const response = await fetch(`https://api.rownd.io/applications/${appId}/users/${userId}/data`, {

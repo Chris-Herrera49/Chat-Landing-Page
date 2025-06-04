@@ -10,4 +10,15 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   background-color: #777777;
+  font-family: var(--font-roboto), 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
+/* Typography styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-roboto), 'Roboto', 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+}
+
+p, span, div, button, input, textarea, select {
+  font-family: var(--font-roboto), 'Roboto', 'Helvetica Neue', sans-serif;
 }

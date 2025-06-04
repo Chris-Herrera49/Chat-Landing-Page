@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRownd } from '@rownd/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -16,6 +16,10 @@ export default function Dashboard() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [invitedBy, setInvitedBy] = useState<string | null>(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+  const inviteModalRef = useRef<HTMLDivElement>(null);
   // Using the specific group ID provided
   const groupId = 'group_fym0bz1znnk0uiwjrc7zhk94';
 
@@ -194,6 +198,23 @@ export default function Dashboard() {
     }
   };
 
+  // Close profile menu and invite modal when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false);
+      }
+      if (inviteModalRef.current && !inviteModalRef.current.contains(event.target as Node)) {
+        setShowInviteModal(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [profileMenuRef, inviteModalRef]);
+
   // Function to fetch inviter details using our API route
   const fetchInviterDetails = async (userId: string) => {
     try {
@@ -252,18 +273,48 @@ export default function Dashboard() {
         backgroundColor: '#1F1F28',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       }}>
-        {/* Logo */}
-        <div style={{ height: '40px', width: '40px', position: 'relative' }}>
+        {/* Logo - Increased size */}
+        <div style={{ height: '60px', width: '60px', position: 'relative' }}>
           <Image 
             src="/irregular_chat_logo.png" 
-            alt="Logo" 
+            alt="IrregularChat Logo" 
             fill
             style={{ objectFit: 'contain' }}
+            priority
           />
         </div>
         
         {/* User Profile and Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {/* Invite Button with Material UI style person_add icon */}
+          <button 
+            onClick={() => setShowInviteModal(true)}
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              color: 'white',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '36px',
+              height: '36px',
+              padding: 0,
+              borderRadius: '50%',
+              transition: 'background-color 0.2s',
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            title="Invite User"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <line x1="19" y1="8" x2="19" y2="14"></line>
+              <line x1="22" y1="11" x2="16" y2="11"></line>
+            </svg>
+          </button>
+          
           {/* Settings Button with Material UI style settings icon */}
           <button style={{
             backgroundColor: 'transparent',
@@ -323,17 +374,73 @@ export default function Dashboard() {
           </span>
           
           {/* Profile Picture - using first letter of name as placeholder */}
-          <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            backgroundColor: '#7C3AED',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 'bold',
-          }}>
-            {user.data.name ? user.data.name.charAt(0).toUpperCase() : 'U'}
+          <div 
+            ref={profileMenuRef}
+            style={{
+              position: 'relative',
+            }}
+          >
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                backgroundColor: '#7C3AED',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'white',
+              }}
+            >
+              {user.data.name ? user.data.name.charAt(0).toUpperCase() : 'U'}
+            </button>
+            
+            {/* Profile Menu Dropdown */}
+            {showProfileMenu && (
+              <div style={{
+                position: 'absolute',
+                top: '45px',
+                right: '0',
+                backgroundColor: '#1F1F28',
+                borderRadius: '0.5rem',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                width: '300px',
+                zIndex: 10,
+                padding: '1rem',
+              }}>
+                <h3 style={{ borderBottom: '1px solid #2D2D3A', paddingBottom: '0.5rem', marginBottom: '0.75rem' }}>
+                  Profile Information
+                </h3>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div>
+                    <p style={{ color: '#9CA3AF', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Email</p>
+                    <p style={{ fontWeight: '500' }}>{user.data.email || 'Not provided'}</p>
+                  </div>
+                  
+                  {invitedBy && (
+                    <div>
+                      <p style={{ color: '#9CA3AF', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Invited by</p>
+                      <p style={{ fontWeight: '500' }}>{invitedBy}</p>
+                    </div>
+                  )}
+                  
+                  <div>
+                    <p style={{ color: '#9CA3AF', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Organization</p>
+                    <p style={{ fontWeight: '500' }}>{user.data.organization || 'Not specified'}</p>
+                  </div>
+                  
+                  <div>
+                    <p style={{ color: '#9CA3AF', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Interests</p>
+                    <p style={{ fontWeight: '500' }}>{user.data.interests || 'None specified'}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -444,111 +551,129 @@ export default function Dashboard() {
           </div>
         </div>
         
-        {/* User Profile Section */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>User Profile</h2>
-          <div style={{ 
-            backgroundColor: '#1F1F28', 
-            padding: '1.5rem', 
-            borderRadius: '0.5rem',
-            maxWidth: '600px'
-          }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              {user.data.email && (
-                <div>
-                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Email</p>
-                  <p>{user.data.email}</p>
-                </div>
-              )}
-              {user.data.name && (
-                <div>
-                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Name</p>
-                  <p>{user.data.name}</p>
-                </div>
-              )}
-              {invitedBy && (
-                <div>
-                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Invited by</p>
-                  <p>{invitedBy}</p>
-                </div>
-              )}
-              {user.data.organization && (
-                <div>
-                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Organization</p>
-                  <p>{user.data.organization}</p>
-                </div>
-              )}
-              {user.data.signal_id && (
-                <div>
-                  <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Signal ID</p>
-                  <p>{user.data.signal_id}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+
         
-        {/* Invite Section */}
-        <div style={{ marginBottom: '2rem', maxWidth: '600px' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Invite a User</h2>
-          <div style={{ 
-            backgroundColor: '#1F1F28', 
-            padding: '1.5rem', 
-            borderRadius: '0.5rem' 
-          }}>
+
+      </div>
+      {/* Invite Modal */}
+      {showInviteModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 50
+        }}>
+          <div 
+            ref={inviteModalRef}
+            style={{
+              backgroundColor: '#1F1F28',
+              borderRadius: '0.5rem',
+              padding: '1.5rem',
+              width: '90%',
+              maxWidth: '500px',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Invite a User</h2>
+              <button 
+                onClick={() => setShowInviteModal(false)}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: '#9CA3AF',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '24px',
+                  height: '24px',
+                  padding: 0,
+                  borderRadius: '50%',
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
                 Invitee Email
               </label>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <input
-                  type="email"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="Enter email address"
+              <input 
+                type="email" 
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                placeholder="Enter email address"
+                style={{
+                  padding: '0.75rem',
+                  borderRadius: '0.375rem',
+                  border: '1px solid #374151',
+                  backgroundColor: '#2D2D3A',
+                  color: 'white',
+                  width: '100%',
+                  marginBottom: '1rem',
+                }}
+                autoFocus
+              />
+              
+              {errorMessage && (
+                <div style={{
+                  backgroundColor: '#7F1D1D',
+                  color: '#FCA5A5',
+                  padding: '0.75rem',
+                  borderRadius: '0.375rem',
+                  fontSize: '0.875rem',
+                  marginBottom: '1rem'
+                }}>
+                  {errorMessage}
+                </div>
+              )}
+              
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <button 
+                  onClick={() => setShowInviteModal(false)}
                   style={{
-                    flex: 1,
-                    padding: '0.75rem',
-                    borderRadius: '0.375rem',
-                    backgroundColor: '#2D2D3A',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '0.25rem',
+                    border: '1px solid #4B5563',
+                    backgroundColor: 'transparent',
                     color: 'white',
-                    border: '1px solid #374151'
-                  }}
-                />
-                <button
-                  onClick={createInvite}
-                  disabled={isCreatingInvite}
-                  style={{
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: '0.375rem',
-                    backgroundColor: isCreatingInvite ? '#4B5563' : '#7C3AED',
-                    color: 'white',
-                    border: 'none',
-                    cursor: isCreatingInvite ? 'not-allowed' : 'pointer',
-                    fontWeight: '500',
+                    cursor: 'pointer',
                   }}
                 >
-                  {isCreatingInvite ? 'Creating...' : 'Create Invite'}
+                  Cancel
+                </button>
+                <button 
+                  onClick={createInvite}
+                  disabled={isCreatingInvite || !inviteEmail}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '0.25rem',
+                    border: 'none',
+                    backgroundColor: '#7C3AED',
+                    color: 'white',
+                    cursor: isCreatingInvite || !inviteEmail ? 'not-allowed' : 'pointer',
+                    opacity: isCreatingInvite || !inviteEmail ? 0.7 : 1,
+                  }}
+                >
+                  {isCreatingInvite ? 'Creating...' : 'Send Invite'}
                 </button>
               </div>
             </div>
-            
-            {errorMessage && (
-              <div style={{
-                backgroundColor: '#7F1D1D',
-                color: '#FCA5A5',
-                padding: '0.75rem',
-                borderRadius: '0.375rem',
-                fontSize: '0.875rem',
-                marginTop: '1rem'
-              }}>
-                {errorMessage}
-              </div>
-            )}
           </div>
         </div>
-      </div>
-    {/* Invite Link Modal */}
+      )}
+      
+      {/* Invite Link Modal */}
       {showInviteLink && (
         <div style={{
           position: 'fixed',
