@@ -9,16 +9,6 @@ import Link from 'next/link';
 export default function Register() {
   const { is_authenticated, requestSignIn, is_initializing } = useRownd();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [invitationToken, setInvitationToken] = useState<string | null>(null);
-
-  // Get invitation token from URL
-  useEffect(() => {
-    const token = searchParams.get('invite');
-    if (token) {
-      setInvitationToken(token);
-    }
-  }, [searchParams]);
 
   // Redirect to dashboard if already authenticated
   useEffect(() => {
@@ -32,20 +22,6 @@ export default function Register() {
     const signUpOptions = {
       intent: "sign_up" as any // Using type assertion to avoid TypeScript errors
     };
-    
-    // Add invitation token if available
-    if (invitationToken) {
-      // In a real application, you would validate this token against your database
-      // and only proceed if it's valid and hasn't been used before
-      
-      // Note: Rownd doesn't have a built-in invitation token system,
-      // so in a real app you would need to implement this on your backend
-      // For now, we're just logging the token
-      console.log(`Using invitation token: ${invitationToken}`);
-      
-      // You could pass this as custom data to Rownd
-      // signUpOptions.init_data = { inviteToken: invitationToken };
-    }
     
     requestSignIn(signUpOptions);
   };
@@ -85,19 +61,6 @@ export default function Register() {
         </h1>
         
         <div style={{ width: '100%' }}>
-          {invitationToken && (
-            <div style={{ 
-              backgroundColor: '#10B981', 
-              color: 'white', 
-              padding: '0.75rem', 
-              borderRadius: '0.25rem', 
-              marginBottom: '1rem',
-              fontSize: '0.875rem'
-            }}>
-              <p>You have been invited to create an account!</p>
-            </div>
-          )}
-          
           <button
             onClick={handleSignIn}
             style={{
@@ -111,7 +74,7 @@ export default function Register() {
               marginBottom: '1rem'
             }}
           >
-            {invitationToken ? 'Accept Invitation & Sign Up' : 'Sign Up with Rownd'}
+            Sign Up with Rownd
           </button>
           
           <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>

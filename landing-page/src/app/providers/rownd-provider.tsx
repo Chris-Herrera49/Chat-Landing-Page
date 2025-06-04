@@ -10,7 +10,7 @@ interface RowndProviderWrapperProps {
 export function RowndProviderWrapper({ children }: RowndProviderWrapperProps) {
   return (
     <RowndProvider
-      appKey="key_jhion5486ej4fglv94oyrfgq"
+      appKey={process.env.NEXT_PUBLIC_ROWND_APP_KEY || "haha"}
     >
       {children}
     </RowndProvider>
