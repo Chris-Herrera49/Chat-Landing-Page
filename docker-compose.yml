@@ -1,0 +1,96 @@
+services:
+  postgresql:
+    image: postgres:13-alpine
+    restart: unless-stopped
+    volumes:
+      - database:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${PG_PASS:?database password required}
+      - POSTGRES_USER=${PG_USER:-authentik}
+      - POSTGRES_DB=${PG_DB:-authentik}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+
+  server:
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-latest}
+    restart: unless-stopped
+    command: server
+    environment:
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      # SMTP Host Emails are sent to
+      AUTHENTIK_EMAIL__HOST: ${SMTP_HOST:-localhost}
+      AUTHENTIK_EMAIL__PORT: ${SMTP_PORT:-25}
+      # Optionally authenticate (don't add quotation marks to your password)
+      AUTHENTIK_EMAIL__USERNAME: ${SMTP_USER:-}
+      AUTHENTIK_EMAIL__PASSWORD: ${SMTP_PASS:-}
+      # Use StartTLS
+      AUTHENTIK_EMAIL__USE_TLS: ${SMTP_USE_TLS:-false}
+      # Use SSL
+      AUTHENTIK_EMAIL__USE_SSL: ${SMTP_USE_SSL:-false}
+      AUTHENTIK_EMAIL__FROM: ${EMAIL_FROM:-authentik@localhost}
+      # Configure primary outgoing email domain
+      AUTHENTIK_EMAIL__DOMAIN: ${EMAIL_DOMAIN:-localhost}
+      # Connection security, can be 'none', 'tls', or 'starttls'
+      AUTHENTIK_EMAIL__CONNECTION_SECURITY: ${EMAIL_CONNECTION_SECURITY:-none}
+      AUTHENTIK_SECRET_KEY: ${SECRET_KEY}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: ${ERROR_REPORTING:-true}
+      # AUTHENTIK_COOKIE_DOMAIN: ${COOKIE_DOMAIN:-authentik.local}
+    volumes:
+      - ./media:/media
+      - ./custom-templates:/templates
+      - ./certs:/certs
+    ports:
+      - "${AUTHENTIK_PORT_HTTP:-9000}:9000"
+      - "${AUTHENTIK_PORT_HTTPS:-9443}:9443"
+    depends_on:
+      - postgresql
+      - redis
+
+  worker:
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-latest}
+    restart: unless-stopped
+    command: worker
+    environment:
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_SECRET_KEY: ${SECRET_KEY}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: ${ERROR_REPORTING:-true}
+    # Uncomment to enable probes
+    # healthcheck:
+    #   test: ["CMD", "curl", "--fail", "http://localhost:9300/healthcheck/"]
+    #   start_period: 20s
+    #   interval: 30s
+    #   retries: 5
+    #   timeout: 5s
+    volumes:
+      - ./media:/media
+      - ./custom-templates:/templates
+      - ./certs:/certs
+    depends_on:
+      - postgresql
+      - redis
+
+volumes:
+  database:
+    driver: local
