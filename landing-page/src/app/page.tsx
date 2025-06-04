@@ -68,13 +68,14 @@ export default function Home() {
               marginBottom: '1rem'
             }}
           >
-            Sign In / Register
+            Sign In
           </button>
           
           <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
             <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '1rem' }}>
               Irregular Chat uses Rownd for secure authentication.
               Sign in with your email, phone, or social accounts.
+              Registration is by invitation only.
             </p>
           </div>
         </div>

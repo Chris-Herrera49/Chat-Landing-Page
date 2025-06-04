@@ -117,7 +117,19 @@ export default function Dashboard() {
               <strong>Email:</strong> {user.data.email || 'Not provided'}
             </p>
             <p style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>
-              <strong>Name:</strong> {user.data.first_name ? `${user.data.first_name} ${user.data.last_name || ''}` : 'Not provided'}
+              <strong>Name:</strong> {user.data.name || 'Not provided'}
+            </p>
+            <p style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+              <strong>Sponsor:</strong> {user.data.sponsor || 'Not provided'}
+            </p>
+            <p style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+              <strong>Interests:</strong> {user.data.interests || 'Not provided'}
+            </p>
+            <p style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+              <strong>Signal ID:</strong> {user.data.signal_id || 'Not provided'}
+            </p>
+            <p style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+              <strong>Organization:</strong> {user.data.organization || 'Not provided'}
             </p>
           </div>
         </div>
