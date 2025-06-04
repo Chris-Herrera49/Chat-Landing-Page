@@ -1,51 +1,23 @@
 "use client";
 
 import Image from 'next/image';
-import { useState } from 'react';
-import Link from 'next/link';
+import { useEffect } from 'react';
+import { useRownd } from '@rownd/react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    
-    try {
-      // This would be replaced with actual authentication logic
-      const response = await fetch('http://localhost:9000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Invalid email or password');
-      }
-      
-      // Redirect to dashboard or home page after successful login
-      window.location.href = '/dashboard';
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
+  const { is_authenticated, requestSignIn, is_initializing } = useRownd();
+  const router = useRouter();
+  
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (is_authenticated && !is_initializing) {
+      router.push('/dashboard');
     }
+  }, [is_authenticated, is_initializing, router]);
+  
+  const handleSignIn = () => {
+    requestSignIn();
   };
 
   return (
@@ -82,64 +54,9 @@ export default function Home() {
           Welcome to Irregular Chat
         </h1>
         
-        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ fontSize: '0.75rem', color: '#9CA3AF', marginBottom: '0.25rem', display: 'block' }}>
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                backgroundColor: '#1F1F28',
-                border: 'none',
-                borderRadius: '0.25rem',
-                color: 'white'
-              }}
-              required
-            />
-          </div>
-          
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ fontSize: '0.75rem', color: '#9CA3AF', marginBottom: '0.25rem', display: 'block' }}>
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                backgroundColor: '#1F1F28',
-                border: 'none',
-                borderRadius: '0.25rem',
-                color: 'white'
-              }}
-              required
-            />
-          </div>
-          
-          {error && (
-            <div style={{ color: '#EF4444', marginBottom: '1rem', fontSize: '0.875rem' }}>
-              {error}
-            </div>
-          )}
-          
-          <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
-            <Link href="/forgot-password" style={{ color: '#9CA3AF', textDecoration: 'none', fontSize: '0.875rem' }}>
-              Forgot Password?
-            </Link>
-          </div>
-          
+        <div style={{ width: '100%' }}>
           <button
-            type="submit"
-            disabled={loading}
+            onClick={handleSignIn}
             style={{
               width: '100%',
               padding: '0.5rem 1rem',
@@ -147,23 +64,20 @@ export default function Home() {
               backgroundColor: '#7C3AED',
               color: 'white',
               border: 'none',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1,
+              cursor: 'pointer',
               marginBottom: '1rem'
             }}
           >
-            {loading ? 'Signing In...' : 'Sign In'}
+            Sign In / Register
           </button>
           
-          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-            <span style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>
-              Don&apos;t have an account?{' '}
-              <Link href="/register" style={{ color: '#7C3AED', textDecoration: 'none' }}>
-                Register
-              </Link>
-            </span>
+          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+            <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginBottom: '1rem' }}>
+              Irregular Chat uses Rownd for secure authentication.
+              Sign in with your email, phone, or social accounts.
+            </p>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
